@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, Button } from "react-native";
+import * as ScreenOrientation from 'expo-screen-orientation';
 import CategoryButton from "./CategoryButton";
 import { FlatList } from "react-native";
-
+import { useEffect } from "react";
 
 export default function HomeScreen({ navigation }) {
 
@@ -25,6 +26,7 @@ export default function HomeScreen({ navigation }) {
             imageFilename: "house.png"
         }
     ]
+
 
     return (
         <FlatList data={CATEGORIES} renderItem={({ item }) => <CategoryButton navigation=

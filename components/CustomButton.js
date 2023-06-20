@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
-export default function CustomButton({style, title, onPress}) {
+export default function CustomButton({ style, title, onPress }) {
 
     const styles = StyleSheet.create({
         container: {

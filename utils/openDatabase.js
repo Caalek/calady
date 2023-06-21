@@ -10,7 +10,7 @@ export async function openDatabase() {
        ) 
            {
                await FileSystem.makeDirectoryAsync(
-               FileSystem.documentDirectory + "SQLite" );
+               FileSystem.documentDirectory + "SQLite/" );
            }
 
     if (!(await 

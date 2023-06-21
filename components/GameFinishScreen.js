@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View, Text, StyleSheet, TextInput } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import CustomButton from "./CustomButton";
 import * as ScreenOrientation from "expo-screen-orientation"
 

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function Timer({ parentStyles, startTimeSeconds, onFinish, changeTime }) {
     const [timeSeconds, setTimeSeconds] = useState(startTimeSeconds)
@@ -31,8 +30,6 @@ export default function Timer({ parentStyles, startTimeSeconds, onFinish, change
             return n
         }
     }
-
-    // console.log(zfill(9))
 
     return (
         <View style={parentStyles}>

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Button, BackHandler, Pressable } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 export default function InfoText({ text, color }) {
 
     const styles = StyleSheet.create({

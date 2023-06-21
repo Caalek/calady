@@ -1,16 +1,16 @@
-import { View, Text, StyleSheet, Button, BackHandler, Pressable } from "react-native";
+import { Text, StyleSheet, Pressable } from "react-native";
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useEffect, useState } from "react";
 import Timer from "./Timer";
 import { Gyroscope } from 'expo-sensors';
 import InfoText from "./InfoText";
+import { openDatabase } from "../utils/openDatabase";
+import * as StatusBar from "expo-status-bar";
 
 export default function GameScreen({ route, navigation }) {
-    // const {numOfPhrases, categoryId, totalTimeSeconds} = route.params
-    const numOfPhrases = 10
-    const totalTimeSeconds = 120
+    const { numOfPhrases, categoryId, categoryName, totalTimeSeconds } = route.params
     const [remainingTime, setRemainingTime] = useState(totalTimeSeconds)
-    const [countDownTimer, setCountdownTimer] = useState(2)
+    const [countDownTimer, setCountdownTimer] = useState(5)
     const [gameStarted, setGameStarted] = useState(false)
     const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0)
     const [gameArray, setGameArray] = useState([])
@@ -21,6 +21,7 @@ export default function GameScreen({ route, navigation }) {
 
     const [viewAnswerConfirm, setViewAnswerConfirm] = useState(false)
     const [viewAnswerSkip, setViewAnswerSkip] = useState(false)
+    const [viewTimeUp, setViewTimeUp] = useState(false)
 
     const [{ x, y, z }, setData] = useState({
         x: 0,
@@ -57,91 +58,40 @@ export default function GameScreen({ route, navigation }) {
         }
     }, [y])
 
-    let ALL = [
-        { title: "Sweet Child o' Mine - Guns N' Roses" },
-        { title: "Billie Jean - Michael Jackson" },
-        { title: "Every Breath You Take - The Police" },
-        { title: "Like a Virgin - Madonna" },
-        { title: "Livin' on a Prayer - Bon Jovi" },
-        { title: "Another One Bites the Dust - Queen" },
-        { title: "Eye of the Tiger - Survivor" },
-        { title: "Walk Like an Egyptian - The Bangles" },
-        { title: "Sweet Dreams (Are Made of This) - Eurythmics" },
-        { title: "Take on Me - a-ha" },
-        { title: "Don't Stop Believin' - Journey" },
-        { title: "I Wanna Dance with Somebody - Whitney Houston" },
-        { title: "Girls Just Want to Have Fun - Cyndi Lauper" },
-        { title: "Pour Some Sugar on Me - Def Leppard" },
-        { title: "Beat It - Michael Jackson" },
-        { title: "Every Rose Has Its Thorn - Poison" },
-        { title: "With or Without You - U2" },
-        { title: "Time After Time - Cyndi Lauper" },
-        { title: "Like a Prayer - Madonna" },
-        { title: "I Love Rock 'n' Roll - Joan Jett & The Blackhearts" },
-        { title: "Sweet Child o' Mine - Guns N' Roses" },
-        { title: "Billie Jean - Michael Jackson" },
-        { title: "Every Breath You Take - The Police" },
-        { title: "Like a Virgin - Madonna" },
-        { title: "Livin' on a Prayer - Bon Jovi" },
-        { title: "Another One Bites the Dust - Queen" },
-        { title: "Eye of the Tiger - Survivor" },
-        { title: "Walk Like an Egyptian - The Bangles" },
-        { title: "Sweet Dreams (Are Made of This) - Eurythmics" },
-        { title: "Take on Me - a-ha" },
-        { title: "Don't Stop Believin' - Journey" },
-        { title: "I Wanna Dance with Somebody - Whitney Houston" },
-        { title: "Girls Just Want to Have Fun - Cyndi Lauper" },
-        { title: "Pour Some Sugar on Me - Def Leppard" },
-        { title: "Beat It - Michael Jackson" },
-        { title: "Every Rose Has Its Thorn - Poison" },
-        { title: "With or Without You - U2" },
-        { title: "Time After Time - Cyndi Lauper" },
-        { title: "Like a Prayer - Madonna" },
-        { title: "I Love Rock 'n' Roll - Joan Jett & The Blackhearts" },
-        { title: "When Doves Cry - Prince" },
-        { title: "The Final Countdown - Europe" },
-        { title: "Careless Whisper - George Michael" },
-        { title: "Wake Me Up Before You Go-Go - Wham!" },
-        { title: "Footloose - Kenny Loggins" },
-        { title: "Don't You (Forget About Me) - Simple Minds" },
-        { title: "We Will Rock You - Queen" },
-        { title: "Ghostbusters - Ray Parker Jr." },
-        { title: "Hungry Like the Wolf - Duran Duran" },
-        { title: "Every Little Thing She Does Is Magic - The Police" },
-        { title: "Total Eclipse of the Heart - Bonnie Tyler" },
-        { title: "Thriller - Michael Jackson" },
-        { title: "Material Girl - Madonna" },
-        { title: "I Just Called to Say I Love You - Stevie Wonder" },
-        { title: "Jump - Van Halen" },
-        { title: "Africa - Toto" },
-        { title: "The Power of Love - Huey Lewis and the News" },
-        { title: "Karma Chameleon - Culture Club" },
-        { title: "Sweet Child - Simply Red" },
-        { title: "I Want to Know What Love Is - Foreigner" },
-        { title: "Take My Breath Away - Berlin" },
-        { title: "We Don't Talk Anymore - Cliff Richard" },
-        { title: "I'm Still Standing - Elton John" },
-        { title: "Don't Stop 'Til You Get Enough - Michael Jackson" },
-        { title: "Papa Don't Preach - Madonna" },
-        { title: "Uptown Girl - Billy Joel" },
-        { title: "It's Raining Men - The Weather Girls" },
-        { title: "You Give Love a Bad Name - Bon Jovi" }
-    ];
+    useEffect(() => {
+        StatusBar.setStatusBarHidden(true)
+    }, [])
 
-
-    function createGameArray() {
-        let i
-        let gameArray = []
-        for (i = 0; i < numOfPhrases; i++) {
-            const randomItem = ALL[Math.floor(Math.random() * ALL.length)]
-            ALL = ALL.filter(item => item !== randomItem)
-            gameArray.push(randomItem)
-        }
-        setGameArray(gameArray)
+    async function createGameArray() {
+        let allPhrases = []
+        const db = await openDatabase()
+        db.transaction((tx) => {
+            tx.executeSql("SELECT phrase FROM phrases WHERE category_id = ? ", [categoryId], (tx, results) => {
+                for (let item of results.rows._array) {
+                    allPhrases.push(item.phrase)
+                }
+                let i
+                let gameArray = []
+                for (i = 0; i < numOfPhrases; i++) {
+                    const randomItem = allPhrases[Math.floor(Math.random() * allPhrases.length)]
+                    allPhrases = allPhrases.filter(item => item !== randomItem)
+                    gameArray.push(randomItem)
+                }
+                setGameArray(gameArray)
+            }, (error) => {
+                console.log(error)
+            })
+        })
     }
 
     function finishGame() {
         navigation.navigate("GameFinishScreen", { confirmed: confirmed, skipped: skipped })
+    }
+
+    function timeUp() {
+        setViewTimeUp(true)
+        setTimeout(setViewTimeUp, 2000, false)
+        setTimeout(finishGame, 2001)
     }
 
     function pass() {
@@ -187,24 +137,32 @@ export default function GameScreen({ route, navigation }) {
         }
     }, [countDownTimer])
 
-    console.log(confirmed)
-
     return (
-        <View style={styles.container}>
+        <>
+        {gameStarted &&
+        <Pressable style={styles.exitButton} onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.exitButton}>Wyjdź</Text>
+        </Pressable>}
+        <Pressable onPress={pass} style={styles.container}>
+            <Pressable style={styles.exitButton} onPress={() => navigation.navigate("Home")}>
+                <Text style={styles.exitText}>Wyjdź</Text>
+            </Pressable>
             {!gameStarted &&
                 <>
                     <Text style={styles.text}>Przygotuj się...</Text>
                     <Text style={styles.text}>{countDownTimer}</Text></>}
-            {gameStarted && !viewAnswerSkip && !viewAnswerConfirm &&
-                <Pressable onPress={pass} style={styles.container}>
-                    <Timer parentStyles={styles.timer} startTimeSeconds={remainingTime} onFinish={finishGame} changeTime={setRemainingTime}></Timer>
-                    <Text style={styles.text}>{gameArray[currentPhraseIndex].title}</Text>
-                    <Text style={styles.categoryName}>Muzyka lat 80.</Text>
-                </Pressable>
+            {gameStarted && !viewAnswerSkip && !viewAnswerConfirm && !viewTimeUp &&
+                <>
+                    <Timer parentStyles={styles.timer} startTimeSeconds={remainingTime} onFinish={timeUp} changeTime={setRemainingTime}></Timer>
+                    <Text style={styles.text}>{gameArray[currentPhraseIndex]}</Text>
+                    <Text style={styles.categoryName}>{categoryName}</Text>
+                </>
             }
             {viewAnswerSkip && <InfoText text="PASUJĘ" color="red"></InfoText>}
             {viewAnswerConfirm && <InfoText text="DOBRZE" color="green"></InfoText>}
-        </View>
+            {viewTimeUp && <InfoText text="KONIEC CZASU" color="orange"></InfoText>}
+        </Pressable>
+        </>
     )
 }
 
@@ -214,7 +172,9 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#52a9ff"
+        backgroundColor: "#52a9ff",
+        width: "100%",
+        height: "100%"
     },
     text: {
         fontSize: 35,
@@ -233,6 +193,17 @@ const styles = StyleSheet.create({
         marginBottom: "5%",
         color: "white",
         fontFamily: "TitanOne",
-        fontSize: 15
+        fontSize: 25
+    },
+    exitButton: {
+        top: 0,
+        left: 0,
+        position: "absolute",
+        margin: "5%",
+    },
+    exitText: {
+        fontFamily: "TitanOne",
+        color: "white",
+        fontSize: 20,
     }
 })

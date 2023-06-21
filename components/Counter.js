@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
-export default function Counter({defaultValue, onValueChange}) {
+export default function Counter({defaultValue, onValueChange, valueDifference}) {
     const [value, setValue] = useState(defaultValue)
 
     const styles = StyleSheet.create({
         text: {
             fontSize: 30,
-            margin: "3%"
+            margin: "3%",
+            fontFamily: "TitanOne"
         },
         container: {
             display: "flex",
@@ -17,7 +18,9 @@ export default function Counter({defaultValue, onValueChange}) {
             color: "white",
             backgroundColor: "#52a9ff",
             alignItems: "center",
-            width: "10%"
+            width: "10%",
+            border: "1% solid",
+            // borderRadius: "7%"
         },
         buttonLabel: {
             fontSize: 30
@@ -29,17 +32,20 @@ export default function Counter({defaultValue, onValueChange}) {
     }, [value])
 
     const subtract = () => {
-        setValue(value - 1)
+        if (value - valueDifference >= 1) {
+            setValue(value - valueDifference)
+        }
     }
 
     const add = () => {
-        setValue(value + 1)
+        setValue(value + valueDifference)
     }
 
     return (
         <View style={styles.container}>
             <Pressable onPress={subtract} style={styles.button}><Text style={styles.buttonLabel}>-</Text></Pressable>
-            <Text style={styles.text}>{value}</Text>
+            <View></View>
+            <TextInput style={styles.text}>{value}</TextInput>
             <Pressable onPress={add} style={styles.button}><Text style={styles.buttonLabel}>+</Text></Pressable>
         </View>
     )

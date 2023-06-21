@@ -6,11 +6,11 @@ export default function CustomButton({ style, title, onPress }) {
             backgroundColor: "#52a9ff",
             padding: "5%",
             border: "1% solid",
-            borderRadius: "10%"
+            // borderRadius: "10%"
         },
         text: {
             color: "white",
-            fontFamily: "Lexend",
+            fontFamily: "TitanOne",
             fontSize: 30
         }
     })

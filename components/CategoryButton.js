@@ -1,26 +1,33 @@
-import { View, Text, Image, StyleSheet, Pressable, ImageBackground } from "react-native";
-export default function CategoryButton({ navigation, title, color }) {
+import { Text, StyleSheet, Pressable, ImageBackground } from "react-native";
+import images from "../utils/images"
+export default function CategoryButton({ navigation, title, color, categoryId, imageFilename }) {
 
     const styles = StyleSheet.create({
         container: {
             margin: "2%",
-            backgroundColor: color,
             color: "white",
-            border: "1px",
+        },
+        image: {
+            border: "1%",
             borderStyle: "solid",
-            borderRadius: "10%",
+            //borderRadius: "15%",
+            overflow: "hidden"
         },
         text: {
             padding: "8%",
             color: "white",
-            fontFamily: "Lexend",
-            fontSize: 20
+            fontFamily: "TitanOne",
+            fontSize: 25,
+            textShadowColor: "black",
+            textShadowRadius: 20
         }
     })
 
     return (
-        <Pressable onPress={() => navigation.navigate("GameSettings", {gameTitle: title})}style={styles.container}>
-            <Text style={styles.text}>{title}</Text>
+        <Pressable onPress={() => navigation.navigate("GameSettings", {gameTitle: title, categoryId: categoryId, imageFilename: imageFilename})} style={styles.container}>
+            <ImageBackground style={styles.image} source={images[imageFilename]}>
+                <Text style={styles.text}>{title}</Text>
+            </ImageBackground>
         </Pressable>
     )
 }

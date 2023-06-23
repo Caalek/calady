@@ -14,7 +14,7 @@ export default function CategoryButton({
     image: {
       border: "1%",
       borderStyle: "solid",
-      //borderRadius: "15%",
+      borderRadius: 13,
       overflow: "hidden",
     },
     text: {

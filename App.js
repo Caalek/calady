@@ -9,8 +9,6 @@ import GameScreen from './components/GameScreen';
 import GameFinishScreen from './components/GameFinishScreen';
 import SettingsScreen from './components/Settings';
 import MenuButton from './components/MenuButton';
-import settings from './utils/settings';
-import * as SQLite from "expo-sqlite"
 
 const Stack = createNativeStackNavigator();
 
@@ -18,21 +16,13 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false)
 
-  console.log("wtf")
   useEffect(() => {
     async function loadFonts() {
       await Font.loadAsync({
         'TitanOne': require("./assets/fonts/TitanOne-Regular.ttf")
       })
       setFontsLoaded(true)
-      console.log("co")
     }
-    // const db = SQLite.openDatabase('settings.db');
-
-    // db.exec([{ sql: 'DROP database settings_numbers', args: [] }], false, () =>
-    //   console.log("dropped")
-    // );
-
     loadFonts()
   }, [])
 

@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#52a9ff",
     padding: "5%",
     border: "1% solid",
-    // borderRadius: "10%"
+    borderRadius: 13
   },
   text: {
     color: "white",

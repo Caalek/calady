@@ -1,46 +1,102 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, BackHandler } from "react-native";
+import Setting from "./Setting";
+import settings from "../utils/settings";
+import { useEffect, useState } from "react";
+import * as Linking from "expo-linking"
 export default function SettingsScreen() {
-  return (
+  const [settingShowBackButtonGame, setSettingShowBackButtonGame] = useState()
+  const [settingShowImagesHome, setSettingShowImagesHome] = useState()
+  const [loading, setLoading] = useState(true)
 
-    <View style={styles.container}>
-      <View style={styles.settings}></View>
-      <Text style={styles.text}>Obrazki kategorii</Text>
-      <Text style={styles.text}>Przycisk "wyjdź" w grze</Text>
+  const GITHUB_URL = "https://github.com/Caalek"
+  const DISCORD_URL = "https://discord.com/users/321328501456109568"
 
-      <View style={styles.iconContainer}>
-        <Image style={{height: 50, width: 50}}   source={require("../assets/github-mark.png")}></Image>
-        <Image style={styles.discordIcon} source={require("../assets/discord-mark-black.png")}></Image>
+  useEffect(() => {
+    async function setData() {
+      const set1 = await settings.getNumber("settingShowBackButtonGame")
+      const set2 = await settings.getNumber("settingShowImagesHome")
+      setSettingShowBackButtonGame(set1)
+      setSettingShowImagesHome(set2)
+      setLoading(false)
+    }
+    setData()
+  }, [])
+
+  async function changeSetting(key, value) {
+    await settings.setNumber(key, value);
+  }
+
+  if (!loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.settings}>
+          <Setting
+            defaultChecked={settingShowBackButtonGame}
+            onCheck={() => changeSetting("settingShowBackButtonGame", 1)}
+            onUncheck={() => changeSetting("settingShowBackButtonGame", 0)}
+            title={`Przycisk "wyjdź" w grze`}
+          />
+        </View>
+        <View style={styles.middleContainer}>
+          <Text style={styles.bottomTextSmall}>Made with ♥️ by Calek</Text>
+          <Text style={styles.bottomText}>Kontakt</Text>
+          <View style={styles.iconContainer}>
+              <Pressable onPress={() => Linking.openURL(GITHUB_URL)}>
+              <Image
+                style={{ height: 50, width: 50 }}
+                source={require("../assets/github-mark.png")}
+              ></Image>
+              </Pressable>
+            <Pressable onPress={() => Linking.openURL(DISCORD_URL)}>
+            <Image
+              style={styles.discordIcon}
+              source={require("../assets/discord-mark-black.png")}
+            ></Image>
+            </Pressable>
+          </View>
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     textAlign: "center",
-    margin: "5%",
-    // justifyContent: "center",
-    // alignItems: "center"
-    textAlign: "left"
-  },
-  settings: {
-    justifyContent: 'space-between'
-  },
-  text: {
-    fontSize: 20,
-    fontFamily: "TitanOne",
-    alignSelf: "flex-end"
+    flexDirection: "column",
+    margin: "2%",
+    height: '90%',
+    gap: 100
   },
   iconContainer: {
-    marginTop: "100%",
-    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     flexDirection: "row",
-    gap: 20
+    gap: 15,
   },
   discordIcon: {
     marginTop: 7,
-    height: 37, width: 52
+    height: 37,
+    width: 52,
+  },
+  settings: {
+    height: "10%",
+  },
+  bottomText: {
+    fontSize: 23,
+    fontFamily: "TitanOne"
+  },
+  bottomTextSmall: {
+    fontSize: 13,
+    fontFamily: "TitanOne"
+  },
+  middleContainer: {
+    bottom: 0,
+    position: 'absolute',
+    width: "100%",
+    justifyContent: "center",
+    alignItems: 'center',
+    gap: 10,
+    flexDirection: 'column'
   }
 });

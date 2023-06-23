@@ -6,9 +6,10 @@ import { Gyroscope } from "expo-sensors";
 import InfoText from "./InfoText";
 import { openDatabase } from "../utils/openDatabase";
 import * as StatusBar from "expo-status-bar";
+import settings from "../utils/settings";
 
 export default function GameScreen({ route, navigation }) {
-  const { numOfPhrases, categoryId, categoryName, totalTimeSeconds } =
+  const { numOfPhrases, categoryId, categoryName, totalTimeSeconds, showExit } =
     route.params;
   const [remainingTime, setRemainingTime] = useState(totalTimeSeconds);
   const [countDownTimer, setCountdownTimer] = useState(5);
@@ -150,21 +151,15 @@ export default function GameScreen({ route, navigation }) {
 
   return (
     <>
-      {gameStarted && (
-        <Pressable
-          style={styles.exitButton}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text style={styles.exitButton}>Wyjdź</Text>
-        </Pressable>
-      )}
       <Pressable onPress={skipAnswer} style={styles.container}>
-        <Pressable
-          style={styles.exitButton}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text style={styles.exitText}>Wyjdź</Text>
-        </Pressable>
+        {gameStarted && showExit && (
+          <Pressable
+            style={styles.exitButton}
+            onPress={() => navigation.navigate("Home")}
+          >
+            <Text style={styles.exitText}>Wyjdź</Text>
+          </Pressable>
+        )}
         {!gameStarted && (
           <>
             <Text style={styles.text}>Przygotuj się...</Text>
@@ -225,6 +220,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     position: "absolute",
+    width: "10%",
     margin: "5%",
   },
   exitText: {

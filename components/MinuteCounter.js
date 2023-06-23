@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "10%",
     border: "1% solid",
-    // borderRadius: "7%"
+    borderRadius: 7
   },
   buttonLabel: {
     fontSize: 35,

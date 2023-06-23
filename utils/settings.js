@@ -30,19 +30,21 @@ function setupDB() {
     );
   });
 
-  settingsDB.transaction((tx) => {
-    tx.executeSql(
-      "INSERT OR IGNORE INTO settings_numbers(id, value) VALUES (?, ?)",
-      ["settingNumPhrases", 10]
-    );
-  });
+  const defaultSettings = {
+    "settingNumPhrases": 10,
+    "settingTimeSeconds": 180,
+    "settingShowBackButtonGame": 1
+  }
 
-  settingsDB.transaction((tx) => {
-    tx.executeSql(
-      "INSERT OR IGNORE INTO settings_numbers(id, value) VALUES (?, ?)",
-      ["settingTimeSeconds", 180]
-    );
-  });
+  for (let [key, value] of Object.entries(defaultSettings)) {
+    settingsDB.transaction((tx) => {
+      tx.executeSql(
+        "INSERT OR IGNORE INTO settings_numbers(id, value) VALUES (?, ?)",
+        [key, value]
+      );
+    });
+
+  } 
 }
 
 setupDB();
@@ -94,7 +96,6 @@ const settings = {
           "SELECT value FROM settings_numbers WHERE id = ?",
           [key],
           (_, results) => {
-            console.log(results.rows);
             if (results.rows.length === 0) {
               resolve(null);
             } else {
@@ -110,7 +111,6 @@ const settings = {
     });
   },
   setNumber: (key, value) => {
-    console.log(value);
     return new Promise((resolve, reject) => {
       settingsDB.transaction((tx) => {
         tx.executeSql(

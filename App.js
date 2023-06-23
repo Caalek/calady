@@ -9,32 +9,32 @@ import GameScreen from './components/GameScreen';
 import GameFinishScreen from './components/GameFinishScreen';
 import SettingsScreen from './components/Settings';
 import MenuButton from './components/MenuButton';
+import settings from './utils/settings';
+import * as SQLite from "expo-sqlite"
 
 const Stack = createNativeStackNavigator();
 
 
-
-
-// const homeNavigationOptions = ({navigation}) => {
-//   return {
-//     headerRight: <Button onPress={navigation.navigate("SettingsScreen")} title="Ustawienia"></Button>
-//   }
-// }
-
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false)
 
+  console.log("wtf")
   useEffect(() => {
     async function loadFonts() {
       await Font.loadAsync({
-        'Lexend': require("./assets/fonts/LexendDeca-Regular.ttf"),
         'TitanOne': require("./assets/fonts/TitanOne-Regular.ttf")
       })
       setFontsLoaded(true)
+      console.log("co")
     }
+    // const db = SQLite.openDatabase('settings.db');
+
+    // db.exec([{ sql: 'DROP database settings_numbers', args: [] }], false, () =>
+    //   console.log("dropped")
+    // );
+
     loadFonts()
-      , []
-  })
+  }, [])
 
   if (fontsLoaded) {
     return (
@@ -49,6 +49,7 @@ export default function App() {
             color: "white"
           },
           headerBackTitleVisible: false,
+          headerTintColor: "white"
         }}>
           <Stack.Screen
             name="Home"

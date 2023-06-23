@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import MinuteDisplay from "./MinuteDisplay";
 export default function Counter({
   defaultValue,
   onValueChange,
@@ -26,7 +27,9 @@ export default function Counter({
       <Pressable onPress={subtract} style={styles.button}>
         <Text style={styles.buttonLabel}>-</Text>
       </Pressable>
-      <TextInput style={styles.text}>{value}</TextInput>
+      <Text style={styles.text}>
+        <MinuteDisplay seconds={value} />
+      </Text>
       <Pressable onPress={add} style={styles.button}>
         <Text style={styles.buttonLabel}>+</Text>
       </Pressable>
@@ -55,6 +58,7 @@ const styles = StyleSheet.create({
   },
   buttonLabel: {
     fontSize: 35,
+    // fontFamily: "TitanOne",
     color: "white"
   },
 });

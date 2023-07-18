@@ -9,6 +9,7 @@ import GameScreen from './components/GameScreen';
 import GameFinishScreen from './components/GameFinishScreen';
 import SettingsScreen from './components/Settings';
 import MenuButton from './components/MenuButton';
+import ImageCreditScreen from './components/ImageCreditScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,7 +46,7 @@ export default function App() {
             name="Home"
             component={HomeScreen}
             options={{
-              title: "Czółko",
+              title: "Calady",
               headerRight: () => (
                 <MenuButton/>
               )
@@ -56,6 +57,7 @@ export default function App() {
           <Stack.Screen name="GameScreen" component={GameScreen} options={{headerShown: false, gestureEnabled: false}}/>
           <Stack.Screen name="GameFinishScreen" component={GameFinishScreen} options={{headerShown: false}}></Stack.Screen>
           <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{title: "Ustawienia"}}></Stack.Screen>
+          <Stack.Screen name="ImageCreditScreen" component={ImageCreditScreen} options={{title: "Źródła"}}></Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     )

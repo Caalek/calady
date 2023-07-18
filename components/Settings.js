@@ -3,13 +3,13 @@ import Setting from "./Setting";
 import settings from "../utils/settings";
 import { useEffect, useState } from "react";
 import * as Linking from "expo-linking"
-export default function SettingsScreen() {
+export default function SettingsScreen({navigation}) {
   const [settingShowBackButtonGame, setSettingShowBackButtonGame] = useState()
   const [settingShowImagesHome, setSettingShowImagesHome] = useState()
   const [loading, setLoading] = useState(true)
 
   const GITHUB_URL = "https://github.com/Caalek"
-  const DISCORD_URL = "https://discord.com/users/321328501456109568"
+  const DISCORD_URL = "mailto:calekdev@gmail.com"
 
   useEffect(() => {
     async function setData() {
@@ -49,11 +49,14 @@ export default function SettingsScreen() {
               </Pressable>
             <Pressable onPress={() => Linking.openURL(DISCORD_URL)}>
             <Image
-              style={styles.discordIcon}
-              source={require("../assets/discord-mark-black.png")}
+              style={styles.mailIcon}
+              source={require("../assets/mail.png")}
             ></Image>
             </Pressable>
           </View>
+          <Pressable onPress={() => navigation.navigate("ImageCreditScreen")} style={styles.credits}>
+            <Text style={styles.creditsText}>Źródła zdjęć</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -74,10 +77,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 15,
   },
-  discordIcon: {
+  mailIcon: {
     marginTop: 7,
     height: 37,
     width: 52,
+  },
+  credits: {
+    marginTop: 10,
+  },
+  creditsText: {
+    fontFamily: "TitanOne"
   },
   settings: {
     height: "10%",

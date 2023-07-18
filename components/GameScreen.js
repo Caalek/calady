@@ -7,6 +7,7 @@ import InfoText from "./InfoText";
 import { openDatabase } from "../utils/openDatabase";
 import * as StatusBar from "expo-status-bar";
 import settings from "../utils/settings";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function GameScreen({ route, navigation }) {
   const { numOfPhrases, categoryId, categoryName, totalTimeSeconds, showExit } =
@@ -24,6 +25,8 @@ export default function GameScreen({ route, navigation }) {
   const [viewAnswerConfirm, setViewAnswerConfirm] = useState(false);
   const [viewAnswerSkip, setViewAnswerSkip] = useState(false);
   const [viewTimeUp, setViewTimeUp] = useState(false);
+
+  const focused = useIsFocused()
 
   const [{ x, y, z }, setData] = useState({
     x: 0,
@@ -114,9 +117,10 @@ export default function GameScreen({ route, navigation }) {
       await ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
       );
+      console.log("i ran")
     }
     lockLandscapeOrientation();
-  }, []);
+  }, [focused]);
 
   useEffect(() => {
     if (countDownTimer > 0) {

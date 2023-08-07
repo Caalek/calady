@@ -1,65 +1,67 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Pressable,
-  BackHandler,
-  Linking,
-} from "react-native";
+import { StyleSheet, FlatList, SafeAreaView} from "react-native";
+import Credit from "./Credit";
 
 export default function ImageCreditScreen() {
   const credits = [
     {
+      id: 1,
       title: "Muzyka z lat 70.",
       desc: "Led Zeppelin acoustic 1973 by Heinrich Klaffs / CC0",
       link: "https://commons.wikimedia.org/wiki/File:Led_Zeppelin_acoustic_1973.jpg",
     },
     {
+      id: 2,
       title: "Muzyka z lat 80.",
       desc: "Eurovision Song Contest 1980 - Profil 1 by Hans van Dijk for Anefo  / CC BY-SA",
       link: "https://commons.wikimedia.org/wiki/File:Led_Zeppelin_acoustic_1973.jpg",
     },
     {
-        title: "Muzyka z lat 90.",
-        desc: "Backstreet Boys 2019 by Glenn Francis / CC BY-SA",
-        link: "https://commons.wikimedia.org/wiki/File:Backstreet_Boys_2019_by_Glenn_Francis.jpg"
+      id: 3,
+      title: "Muzyka z lat 90.",
+      desc: "Backstreet Boys 2019 by Glenn Francis / CC BY-SA",
+      link: "https://commons.wikimedia.org/wiki/File:Backstreet_Boys_2019_by_Glenn_Francis.jpg",
     },
     {
-        title: "Muzyka z lat 2000",
-        desc: "Linkin park by EternalRemorse / CC ",
-        link: "https://evanescencereference.info/wiki/index.php?title=File:Linkin_park.jpg"
+      id: 4,
+      title: "Muzyka z lat 00.",
+      desc: "Linkin park by EternalRemorse / CC ",
+      link: "https://evanescencereference.info/wiki/index.php?title=File:Linkin_park.jpg",
     },
     {
-        title: "Muzyka z lat 2010",
-        desc: "Rumores acerca de lo nuevo de Arctic Monkeys / CC BY-NC-SA",
-        link: "https://canchageneral.com/rumores-acerca-lo-nuevo-arctic-monkeys/"
+      id: 5,
+      title: "Muzyka z lat 10.",
+      desc: "Rumores acerca de lo nuevo de Arctic Monkeys / CC BY-NC-SA",
+      link: "https://canchageneral.com/rumores-acerca-lo-nuevo-arctic-monkeys/",
     },
     {
-        title: "Gry wideo",
-        desc: "Backstreet Boys 2019 by Glenn Francis / CC BY-SA",
-        link: "https://commons.wikimedia.org/wiki/File:Backstreet_Boys_2019_by_Glenn_Francis.jpg"
+      id: 6,
+      title: "Gry wideo",
+      desc: "Videogameretaildisplay.jpg by Coolcaesar / CC BY-SA",
+      link: "https://commons.wikimedia.org/wiki/File:Backstreet_Boys_2019_by_Glenn_Francis.jpg",
     },
     {
-        title: "Postaci fikcyjne",
-        desc: "Wiedźmin - własność CD PROJEKT RED",
-        link: "https://www.thewitcher.com"
+      id: 7,
+      title: "Języki",
+      desc: "Flags of students home countries at the University of Rochester by Tomwsulcer / CC0",
+      link: "https://commons.wikimedia.org/wiki/File:Flags_of_students_home_countries_at_the_University_of_Rochester.jpg",
     },
+    {
+      id: 8,
+      title: "Jacek Kaczmarski",
+      desc: 'Jacek Kaczmarski w programie A.T.Kijowskiego "A Teraz Konkretnie", domena publiczna',
+      link: "https://commons.wikimedia.org/wiki/File:A.T.Kijowski_%26_Jacek_Kaaczmarski.jpg"
+    }
   ];
-
   return (
-    <View style={styles.text}>
-      {credits.map((credit) => {
-        return (
-          <View style={styles.creditItem}>
-            <Text style={styles.textItem}>{credit.title}</Text>
-            <Pressable onPress={() => Linking.openURL(credit.link)}>
-              <Text style={styles.descItem}>{credit.desc}</Text>
-            </Pressable>
-          </View>
-        );
-      })}
-    </View>
+    <SafeAreaView>
+      <FlatList
+        data={credits}
+        renderItem={({ item }) => (
+          <Credit title={item.title} desc={item.desc} link={item.link}></Credit>
+        )}
+        keyExtractor={(item) => item.id}
+      />
+    </SafeAreaView>
   );
 }
 
@@ -79,6 +81,6 @@ const styles = StyleSheet.create({
   },
   descItem: {
     padding: 10,
-    color: "blue"
-  }
+    color: "blue",
+  },
 });

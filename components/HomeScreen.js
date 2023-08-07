@@ -1,4 +1,4 @@
-import { FlatList } from "react-native";
+import { FlatList, SafeAreaView } from "react-native";
 import { useEffect, useState } from "react";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { useIsFocused } from "@react-navigation/native";
@@ -51,19 +51,20 @@ export default function HomeScreen({ route, navigation }) {
       ),
     });
   });
-
   return (
-    <FlatList
-      data={categories}
-      renderItem={({ item }) => (
-        <CategoryButton
-          navigation={navigation}
-          title={item.name}
-          categoryId={item.id}
-          imageFilename={item["image_filename"]}
-        />
-      )}
-      keyExtractor={(item) => item.id}
-    />
+    <SafeAreaView>
+      <FlatList
+        data={categories}
+        renderItem={({ item }) => (
+          <CategoryButton
+            navigation={navigation}
+            title={item.name}
+            categoryId={item.id}
+            imageFilename={item["image_filename"]}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+      />
+    </SafeAreaView>
   );
 }

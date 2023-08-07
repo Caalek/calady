@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 export default function CustomButton({ style, title, onPress }) {
   return (
     <View style={style}>

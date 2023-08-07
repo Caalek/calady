@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Checkbox from "./Checkbox";
 export default function Setting({ defaultChecked, onCheck, onUncheck, title }) {
   return (

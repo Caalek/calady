@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, Pressable, BackHandler } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import Setting from "./Setting";
 import settings from "../utils/settings";
 import { useEffect, useState } from "react";

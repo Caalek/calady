@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "czolko-gorski",
-    "slug": "czolko-gorski",
+    "name": "calady",
+    "slug": "calady",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,14 +16,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.calek.czolkogorski"
+      "bundleIdentifier": "com.calek.calady"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.calek.czolkogorski"
+      "package": "com.calek.calady"
     },
     "web": {
       "favicon": "./assets/favicon.png"

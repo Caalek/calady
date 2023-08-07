@@ -6,7 +6,6 @@ import { Gyroscope } from "expo-sensors";
 import InfoText from "./InfoText";
 import { openDatabase } from "../utils/openDatabase";
 import * as StatusBar from "expo-status-bar";
-import settings from "../utils/settings";
 import { useIsFocused } from "@react-navigation/native";
 
 export default function GameScreen({ route, navigation }) {
@@ -117,7 +116,6 @@ export default function GameScreen({ route, navigation }) {
       await ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
       );
-      console.log("i ran")
     }
     lockLandscapeOrientation();
   }, [focused]);

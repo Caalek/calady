@@ -1,3 +1,0 @@
-- dodać logo (jest gotowe)
-- dać nową bazę i wymienić
-- jakiś cleanup pewnie

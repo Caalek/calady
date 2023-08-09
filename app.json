@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "calady",
+    "name": "Calady",
     "slug": "calady",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#58a8fb"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -21,12 +21,17 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#58a8fb"
       },
       "package": "com.calek.calady"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dbcac4c9-8281-4db2-bdeb-0525d34efcb3"
+      }
     }
   }
 }

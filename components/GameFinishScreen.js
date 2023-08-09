@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, StatusBar } from "react-native";
 import CustomButton from "./CustomButton";
 import * as ScreenOrientation from "expo-screen-orientation";
 
@@ -16,6 +16,8 @@ export default function GameFinishScreen({ route, navigation }) {
   }, []);
 
   return (
+    <>
+    <StatusBar hidden={true} />
     <View style={styles.container}>
       <Text style={styles.title}>Gra ukończona</Text>
       <Text style={styles.big}>{confirmed}</Text>
@@ -25,6 +27,7 @@ export default function GameFinishScreen({ route, navigation }) {
         onPress={() => navigation.navigate("Home")}
       ></CustomButton>
     </View>
+    </>
   );
 }
 

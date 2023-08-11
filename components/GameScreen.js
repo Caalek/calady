@@ -1,12 +1,12 @@
-import { Text, StyleSheet, Pressable } from "react-native";
+import { Text, StyleSheet, Pressable, View } from "react-native";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { useEffect, useState } from "react";
 import Timer from "./Timer";
-import { Gyroscope } from "expo-sensors";
 import InfoText from "./InfoText";
 import { openDatabase } from "../utils/openDatabase";
 import * as StatusBar from "expo-status-bar";
 import { useIsFocused } from "@react-navigation/native";
+import Button from "./Button";
 
 export default function GameScreen({ route, navigation }) {
   const { numOfPhrases, categoryId, categoryName, totalTimeSeconds, showExit } =
@@ -16,7 +16,6 @@ export default function GameScreen({ route, navigation }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [gameArray, setGameArray] = useState([]);
-  const [previousY, setPreviousY] = useState(0);
 
   const [skipped, setSkipped] = useState(0);
   const [confirmed, setConfirmed] = useState(0);
@@ -25,28 +24,7 @@ export default function GameScreen({ route, navigation }) {
   const [viewAnswerSkip, setViewAnswerSkip] = useState(false);
   const [viewTimeUp, setViewTimeUp] = useState(false);
 
-  const focused = useIsFocused()
-
-  const [{ x, y, z }, setData] = useState({
-    x: 0,
-    y: 0,
-    z: 0,
-  });
-  const [subscription, setSubscription] = useState(null);
-
-  const subscribeToGyroscope = () => {
-    setSubscription(
-      Gyroscope.addListener((gyroscopeData) => {
-        setData(gyroscopeData);
-        setPreviousY(gyroscopeData.y);
-      })
-    );
-  };
-
-  const unsubscribeFromGyroscope = () => {
-    subscription && subscription.remove();
-    setSubscription(null);
-  };
+  const focused = useIsFocused();
 
   const createGameArray = async () => {
     let allPhrases = [];
@@ -96,7 +74,7 @@ export default function GameScreen({ route, navigation }) {
       setCurrentPhraseIndex(currentPhraseIndex + 1);
       setSkipped(skipped + 1);
       setViewAnswerSkip(true);
-      setTimeout(setViewAnswerSkip, 2000, false);
+      setTimeout(setViewAnswerSkip, 3000, false);
     }
   };
 
@@ -107,7 +85,7 @@ export default function GameScreen({ route, navigation }) {
       setCurrentPhraseIndex(currentPhraseIndex + 1);
       setConfirmed(confirmed + 1);
       setViewAnswerConfirm(true);
-      setTimeout(setViewAnswerConfirm, 2000, false);
+      setTimeout(setViewAnswerConfirm, 3000, false);
     }
   };
 
@@ -135,33 +113,12 @@ export default function GameScreen({ route, navigation }) {
   }, [countDownTimer]);
 
   useEffect(() => {
-    subscribeToGyroscope();
-    Gyroscope.setUpdateInterval(550);
-    return () => unsubscribeFromGyroscope();
-  }, []);
-
-  useEffect(() => {
-    let difference = Math.abs(y - previousY);
-    if (difference > 6 && !viewAnswerSkip) {
-      confirmAnswer();
-    }
-  }, [y]);
-
-  useEffect(() => {
     StatusBar.setStatusBarHidden(true);
   }, []);
 
   return (
     <>
-      <Pressable onPress={skipAnswer} style={styles.container}>
-        {gameStarted && showExit && (
-          <Pressable
-            style={styles.exitButton}
-            onPress={() => navigation.navigate("Home")}
-          >
-            <Text style={styles.exitText}>Wyjdź</Text>
-          </Pressable>
-        )}
+      <View style={styles.container}>
         {!gameStarted && (
           <>
             <Text style={styles.text}>Przygotuj się...</Text>
@@ -172,21 +129,39 @@ export default function GameScreen({ route, navigation }) {
           !viewAnswerSkip &&
           !viewAnswerConfirm &&
           !viewTimeUp && (
-            <>
+            <View style={styles.gameContainer}>
+              {showExit && (
+                <Pressable
+                  style={styles.exitButton}
+                  onPress={() => navigation.navigate("Home")}
+                >
+                  <Text style={styles.exitText}>Wyjdź</Text>
+                </Pressable>
+              )}
               <Timer
                 parentStyles={styles.timer}
                 startTimeSeconds={remainingTime}
                 onFinish={timeUp}
                 changeTime={setRemainingTime}
               ></Timer>
-              <Text style={styles.text}>{gameArray[currentPhraseIndex]}</Text>
-              <Text style={styles.categoryName}>{categoryName}</Text>
-            </>
+              <View style={styles.titleContainer}>
+                <Text style={styles.text}>{gameArray[currentPhraseIndex]}</Text>
+              </View>
+              {/* <Text style={styles.categoryName}>{categoryName}</Text> */}
+              <View style={styles.buttonContainer}>
+                <Button color="red" text="PASUJĘ" onPress={skipAnswer}></Button>
+                <Button
+                  color="green"
+                  text="DOBRZE"
+                  onPress={confirmAnswer}
+                ></Button>
+              </View>
+            </View>
           )}
         {viewAnswerSkip && <InfoText text="PASUJĘ" color="red"></InfoText>}
         {viewAnswerConfirm && <InfoText text="DOBRZE" color="green"></InfoText>}
         {viewTimeUp && <InfoText text="KONIEC CZASU" color="orange"></InfoText>}
-      </Pressable>
+      </View>
     </>
   );
 }
@@ -206,7 +181,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   timer: {
-    position: "absolute",
+    // position: "absolute",
     top: 0,
     marginTop: "5%",
   },
@@ -229,5 +204,22 @@ const styles = StyleSheet.create({
     fontFamily: "TitanOne",
     color: "white",
     fontSize: 20,
+  },
+  gameContainer: {
+    flex: 1,
+    gap: 20,
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  buttonContainer: {
+    flex: 1,
+    gap: 30,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  titleContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

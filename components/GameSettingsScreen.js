@@ -66,10 +66,6 @@ export default function GameSettingsScreen({ route, navigation }) {
             onValueChange={setTimeSeconds}
             valueDifference={10}
           />
-          <Text style={styles.info}>
-            W trakcie gry, jeśli nie uda ci się zgadnąć, kliknij w ekran. Jeśli
-            zgadłeś, pochyl urządzenie do przodu.
-          </Text>
         </View>
         <CustomButton
           style={styles.button}
@@ -115,12 +111,6 @@ const styles = StyleSheet.create({
   button: {
     marginTop: "5%",
     marginBottom: "20%",
-  },
-  info: {
-    padding: "3%",
-    fontSize: 17,
-    fontFamily: "TitanOne",
-    // color: "white"
   },
   image: {
     height: 200,

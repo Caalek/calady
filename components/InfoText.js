@@ -7,6 +7,11 @@ export default function InfoText({ text, color }) {
             fontFamily: "TitanOne",
             color: "white"
         },
+        smallText: {
+            fontFamily: "TitanOne",
+            fontSize: 25,
+            color: "white"
+        },
         container: {
             flex: 1,
             alignItems: "center",
@@ -20,6 +25,7 @@ export default function InfoText({ text, color }) {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>{text}</Text>
+            <Text style={styles.smallText}>Połóż telefon na czoło!</Text>
         </View>
     )
 }

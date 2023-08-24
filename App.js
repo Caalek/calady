@@ -10,6 +10,7 @@ import GameFinishScreen from './components/GameFinishScreen';
 import SettingsScreen from './components/Settings';
 import MenuButton from './components/MenuButton';
 import ImageCreditScreen from './components/ImageCreditScreen';
+import PhraseListScreen from './components/PhraseListScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +59,7 @@ export default function App() {
           <Stack.Screen name="GameFinishScreen" component={GameFinishScreen} options={{headerShown: false}}></Stack.Screen>
           <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{title: "Ustawienia"}}></Stack.Screen>
           <Stack.Screen name="ImageCreditScreen" component={ImageCreditScreen} options={{title: "Źródła"}}></Stack.Screen>
+          <Stack.Screen name="PhraseListScreen" component={PhraseListScreen} options={{title: "Hasła"}}></Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     )

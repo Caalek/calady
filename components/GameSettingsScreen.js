@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import CustomButton from "./CustomButton";
 import images from "../utils/images";
 import settings from "../utils/settings";
+import Button from "./Button";
 
 export default function GameSettingsScreen({ route, navigation }) {
   const { gameTitle, categoryId, imageFilename } = route.params;
@@ -80,6 +81,14 @@ export default function GameSettingsScreen({ route, navigation }) {
             })
           }
         />
+        <View style={styles.buttonContainer}>
+          <Button
+            text="Zobacz hasła"
+            color="#52A9FF"
+            overrideFontSize={21}
+            onPress={() => navigation.navigate("PhraseListScreen")}
+          ></Button>
+        </View>
       </View>
     );
   }
@@ -114,5 +123,9 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 200,
+  },
+  buttonContainer: {
+    height: "10%",
+    width: "50%"
   }
 });

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { View, Text, StyleSheet, StatusBar } from "react-native";
-import CustomButton from "./CustomButton";
+import Button from "./Button";
 import * as ScreenOrientation from "expo-screen-orientation";
 
 export default function GameFinishScreen({ route, navigation }) {
@@ -19,13 +19,16 @@ export default function GameFinishScreen({ route, navigation }) {
     <>
     <StatusBar hidden={true} />
     <View style={styles.container}>
-      <Text style={styles.title}>Gra ukończona</Text>
+      <Text style={styles.title}>Gra ukończona!</Text>
       <Text style={styles.big}>{confirmed}</Text>
       <Text style={styles.text}>odgadniętych haseł</Text>
-      <CustomButton
-        title="Jeszcze raz"
-        onPress={() => navigation.navigate("Home")}
-      ></CustomButton>
+      <View style={styles.buttonContainer}>
+        <Button
+          text="Jeszcze raz"
+          color="#1f90ff"
+          onPress={() => navigation.navigate("Home")}
+        ></Button>
+      </View>
     </View>
     </>
   );
@@ -34,6 +37,7 @@ export default function GameFinishScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: 7,
     justifyContent: "center",
     alignItems: "center",
     height: "100%",
@@ -55,4 +59,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "TitanOne",
   },
+  buttonContainer: {
+    height: "12%",
+    width: "60%"
+  }
 });

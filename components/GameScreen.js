@@ -148,17 +148,21 @@ export default function GameScreen({ route, navigation }) {
                 <Text style={styles.text}>{gameArray[currentPhraseIndex]}</Text>
               </View>
               {/* <Text style={styles.categoryName}>{categoryName}</Text> */}
-              <View style={styles.buttonContainer}>
-                <Button color="red" text="PASUJĘ" onPress={skipAnswer}></Button>
+              <View style={styles.buttonsContainer}>
+                <View style={styles.buttonContainer}>
+                <Button color="red" text="PAS" onPress={skipAnswer}></Button>
+                </View>
+                <View style={styles.buttonContainer}>
                 <Button
                   color="green"
                   text="DOBRZE"
                   onPress={confirmAnswer}
                 ></Button>
+                </View>
               </View>
             </View>
           )}
-        {viewAnswerSkip && <InfoText text="PASUJĘ" color="red"></InfoText>}
+        {viewAnswerSkip && <InfoText text="PAS" color="red"></InfoText>}
         {viewAnswerConfirm && <InfoText text="DOBRZE" color="green"></InfoText>}
         {viewTimeUp && <InfoText text="KONIEC CZASU" color="orange"></InfoText>}
       </View>
@@ -176,7 +180,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   text: {
-    fontSize: 35,
+    fontSize: 38,
     fontFamily: "TitanOne",
     color: "white",
   },
@@ -203,7 +207,7 @@ const styles = StyleSheet.create({
   exitText: {
     fontFamily: "TitanOne",
     color: "white",
-    fontSize: 20,
+    fontSize: 23,
   },
   gameContainer: {
     flex: 1,
@@ -211,11 +215,15 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
   },
-  buttonContainer: {
+  buttonsContainer: {
     flex: 1,
     gap: 30,
     alignItems: "center",
     flexDirection: "row",
+  },
+  buttonContainer: {
+    height: "85%",
+    width: "40%"
   },
   titleContainer: {
     flex: 1,

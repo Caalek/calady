@@ -7,10 +7,17 @@ import { openDatabase } from "../utils/openDatabase";
 import * as StatusBar from "expo-status-bar";
 import { useIsFocused } from "@react-navigation/native";
 import Button from "./Button";
+import { Audio } from "expo-av";
 
 export default function GameScreen({ route, navigation }) {
-  const { numOfPhrases, categoryId, categoryName, totalTimeSeconds, showExit } =
-    route.params;
+  const {
+    numOfPhrases,
+    categoryId,
+    categoryName,
+    totalTimeSeconds,
+    showExit,
+    imageFilename,
+  } = route.params;
   const [remainingTime, setRemainingTime] = useState(totalTimeSeconds);
   const [countDownTimer, setCountdownTimer] = useState(5);
   const [gameStarted, setGameStarted] = useState(false);
@@ -23,6 +30,8 @@ export default function GameScreen({ route, navigation }) {
   const [viewAnswerConfirm, setViewAnswerConfirm] = useState(false);
   const [viewAnswerSkip, setViewAnswerSkip] = useState(false);
   const [viewTimeUp, setViewTimeUp] = useState(false);
+
+  const [sound, setSound] = useState();
 
   const focused = useIsFocused();
 
@@ -55,10 +64,14 @@ export default function GameScreen({ route, navigation }) {
   };
 
   const finishGame = () => {
+    playFinishSound()
     navigation.navigate("GameFinishScreen", {
       confirmed: confirmed,
       skipped: skipped,
-    });
+      gameTitle: categoryName,
+      categoryId: categoryId,
+      imageFilename: imageFilename,
+    })
   };
 
   const timeUp = () => {
@@ -75,8 +88,42 @@ export default function GameScreen({ route, navigation }) {
       setSkipped(skipped + 1);
       setViewAnswerSkip(true);
       setTimeout(setViewAnswerSkip, 3000, false);
+      playSkipSound()
     }
   };
+
+   // tu się funkcje powtarzają, bo, znowu, require() nie przyjmuje 
+   // dynamicznych stringów i nie mogę dać jako zmiennej do funkcji
+  const playConfirmSound = async () => {
+    console.log("loading success sound");
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sounds/confirm.mp3")
+    );
+    console.log(sound)
+    setSound(sound);
+    await sound.playAsync();
+  };
+
+  const playSkipSound = async () => {
+    console.log("loading skip sound");
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sounds/skip.mp3")
+    );
+    console.log(sound)
+    setSound(sound);
+    await sound.playAsync();
+  };
+
+  const playFinishSound = async () => {
+    console.log("loading finsh sound");
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sounds/finish.mp3")
+    );
+    console.log(sound)
+    setSound(sound);
+    await sound.playAsync();
+  };
+
 
   const confirmAnswer = () => {
     if (currentPhraseIndex + 1 === gameArray.length) {
@@ -86,8 +133,18 @@ export default function GameScreen({ route, navigation }) {
       setConfirmed(confirmed + 1);
       setViewAnswerConfirm(true);
       setTimeout(setViewAnswerConfirm, 3000, false);
+      playConfirmSound();
     }
   };
+
+  const exitToCategory = () => {
+      navigation.navigate("GameSettings", {
+        skipped: skipped,
+        gameTitle: categoryName,
+        categoryId: categoryId,
+        imageFilename: imageFilename,
+      })
+  }
 
   useEffect(() => {
     async function lockLandscapeOrientation() {
@@ -116,6 +173,15 @@ export default function GameScreen({ route, navigation }) {
     StatusBar.setStatusBarHidden(true);
   }, []);
 
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log("Unloading Sound");
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
   return (
     <>
       <View style={styles.container}>
@@ -133,7 +199,7 @@ export default function GameScreen({ route, navigation }) {
               {showExit && (
                 <Pressable
                   style={styles.exitButton}
-                  onPress={() => navigation.navigate("Home")}
+                  onPress={exitToCategory}
                 >
                   <Text style={styles.exitText}>Wyjdź</Text>
                 </Pressable>
@@ -150,14 +216,14 @@ export default function GameScreen({ route, navigation }) {
               {/* <Text style={styles.categoryName}>{categoryName}</Text> */}
               <View style={styles.buttonsContainer}>
                 <View style={styles.buttonContainer}>
-                <Button color="red" text="PAS" onPress={skipAnswer}></Button>
+                  <Button color="red" text="PAS" onPress={skipAnswer}></Button>
                 </View>
                 <View style={styles.buttonContainer}>
-                <Button
-                  color="green"
-                  text="DOBRZE"
-                  onPress={confirmAnswer}
-                ></Button>
+                  <Button
+                    color="green"
+                    text="DOBRZE"
+                    onPress={confirmAnswer}
+                  ></Button>
                 </View>
               </View>
             </View>
@@ -223,7 +289,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     height: "85%",
-    width: "40%"
+    width: "40%",
   },
   titleContainer: {
     flex: 1,

@@ -22,6 +22,7 @@ export default function App() {
     async function loadFonts() {
       await Font.loadAsync({
         'TitanOne': require("./assets/fonts/TitanOne-Regular.ttf")
+        // 'Inter': require("./assets/fonts/Inter.ttf")
       })
       setFontsLoaded(true)
     }

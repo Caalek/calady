@@ -44,12 +44,6 @@ export default function ImageCreditScreen() {
       title: "Języki",
       desc: "Flags of students home countries at the University of Rochester by Tomwsulcer / CC0",
       link: "https://commons.wikimedia.org/wiki/File:Flags_of_students_home_countries_at_the_University_of_Rochester.jpg",
-    },
-    {
-      id: 8,
-      title: "Jacek Kaczmarski",
-      desc: 'Jacek Kaczmarski w programie A.T.Kijowskiego "A Teraz Konkretnie", domena publiczna',
-      link: "https://commons.wikimedia.org/wiki/File:A.T.Kijowski_%26_Jacek_Kaaczmarski.jpg"
     }
   ];
   return (

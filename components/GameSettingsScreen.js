@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import Counter from "./Counter";
 import MinuteCounter from "./MinuteCounter";
 import { View, Text, StyleSheet, Image } from "react-native";
+import * as ScreenOrientation from "expo-screen-orientation";
+import * as StatusBar from "expo-status-bar";
 import CustomButton from "./CustomButton";
 import images from "../utils/images";
 import settings from "../utils/settings";
 import Button from "./Button";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function GameSettingsScreen({ route, navigation }) {
   const { gameTitle, categoryId, imageFilename } = route.params;
@@ -13,6 +16,7 @@ export default function GameSettingsScreen({ route, navigation }) {
   const [timeSeconds, setTimeSeconds] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showExit, setShowExit] = useState(false);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     async function syncDB() {
@@ -44,6 +48,22 @@ export default function GameSettingsScreen({ route, navigation }) {
     }
     setData();
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      const lockLandscapeOrientation = async () => {
+        await ScreenOrientation.lockAsync(
+          ScreenOrientation.OrientationLock.PORTRAIT_UP
+        );
+      }
+      lockLandscapeOrientation();
+      StatusBar.setStatusBarHidden(false);
+    }
+  }, [isFocused]);
+
+  function navigateToPhraseList() {
+    navigation.navigate("PhraseListScreen", {categoryId: categoryId})
+  }
 
   if (!loading) {
     return (
@@ -78,6 +98,7 @@ export default function GameSettingsScreen({ route, navigation }) {
               categoryName: gameTitle,
               totalTimeSeconds: timeSeconds,
               showExit: showExit,
+              imageFilename: imageFilename
             })
           }
         />
@@ -85,8 +106,8 @@ export default function GameSettingsScreen({ route, navigation }) {
           <Button
             text="Zobacz hasła"
             color="#52A9FF"
-            overrideFontSize={21}
-            onPress={() => navigation.navigate("PhraseListScreen")}
+            overrideFontSize={20}
+            onPress={navigateToPhraseList}
           ></Button>
         </View>
       </View>
@@ -119,13 +140,13 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: "5%",
-    marginBottom: "20%",
+    marginBottom: "5%",
   },
   image: {
     height: 200,
   },
   buttonContainer: {
-    height: "10%",
+    height: "9%",
     width: "50%"
   }
 });

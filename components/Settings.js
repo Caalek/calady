@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import Setting from "./Setting";
-import settings from "../utils/settings";
 import { useEffect, useState } from "react";
 import * as Linking from "expo-linking"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function SettingsScreen({navigation}) {
-  const [settingShowBackButtonGame, setSettingShowBackButtonGame] = useState()
-  const [settingShowImagesHome, setSettingShowImagesHome] = useState()
+  const [settingShowBackButton, setSettingShowBackButton] = useState()
+  const [settingSoundEffects, setSettingSoundEffects] = useState()
+
   const [loading, setLoading] = useState(true)
 
   const GITHUB_URL = "https://github.com/Caalek"
@@ -13,17 +15,21 @@ export default function SettingsScreen({navigation}) {
 
   useEffect(() => {
     async function setData() {
-      const set1 = await settings.getNumber("settingShowBackButtonGame")
-      const set2 = await settings.getNumber("settingShowImagesHome")
-      setSettingShowBackButtonGame(set1)
-      setSettingShowImagesHome(set2)
+      const showBackButton = parseInt(await AsyncStorage.getItem("settingShowBackButton"))
+      setSettingShowBackButton(showBackButton)
+      const soundEffects = parseInt(await AsyncStorage.getItem("settingSoundEffects"))
+      setSettingSoundEffects(soundEffects)
       setLoading(false)
     }
     setData()
   }, [])
 
-  async function changeSetting(key, value) {
-    await settings.setNumber(key, value);
+  async function setSetting(key, value) {
+    try {
+      await AsyncStorage.setItem(key, value)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   if (!loading) {
@@ -31,14 +37,19 @@ export default function SettingsScreen({navigation}) {
       <View style={styles.container}>
         <View style={styles.settings}>
           <Setting
-            defaultChecked={settingShowBackButtonGame}
-            onCheck={() => changeSetting("settingShowBackButtonGame", 1)}
-            onUncheck={() => changeSetting("settingShowBackButtonGame", 0)}
+            defaultChecked={settingShowBackButton}
+            onCheck={() => setSetting("settingShowBackButton", "1")}
+            onUncheck={() => setSetting("settingShowBackButton", "0")}
             title={`Przycisk "wyjdź" w grze`}
+          />
+          <Setting
+            defaultChecked={settingSoundEffects}
+            onCheck={() => setSetting("settingSoundEffects", "1")}
+            onUncheck={() => setSetting("settingSoundEffects", "0")}
+            title={"Efekty dźwiękowe"}
           />
         </View>
         <View style={styles.middleContainer}>
-          <Text style={styles.bottomTextSmall}>Made with ♥️ by Calek</Text>
           <Text style={styles.bottomText}>Kontakt</Text>
           <View style={styles.iconContainer}>
               <Pressable onPress={() => Linking.openURL(GITHUB_URL)}>
@@ -89,7 +100,7 @@ const styles = StyleSheet.create({
     fontFamily: "TitanOne"
   },
   settings: {
-    height: "10%",
+    height: "15%"
   },
   bottomText: {
     fontSize: 23,

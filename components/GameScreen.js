@@ -8,6 +8,8 @@ import * as StatusBar from "expo-status-bar";
 import { useIsFocused } from "@react-navigation/native";
 import Button from "./Button";
 import { Audio } from "expo-av";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { parse } from "expo-linking";
 
 export default function GameScreen({ route, navigation }) {
   const {
@@ -15,8 +17,9 @@ export default function GameScreen({ route, navigation }) {
     categoryId,
     categoryName,
     totalTimeSeconds,
-    showExit,
+    showBackButton,
     imageFilename,
+    soundEffects
   } = route.params;
   const [remainingTime, setRemainingTime] = useState(totalTimeSeconds);
   const [countDownTimer, setCountdownTimer] = useState(5);
@@ -35,26 +38,86 @@ export default function GameScreen({ route, navigation }) {
 
   const focused = useIsFocused();
 
+  const checkIfNoMinimum = (list) => {
+    let i;
+    let firstItem = list[0]
+    for (i = 0; i < list.length; i++) {
+      if (list[i] !== firstItem) {
+        return false
+      }
+    }
+    return true
+  }
+
+  const findMinimum = (list) => {
+    console.log(list)
+    let minimum = 999999
+    let i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i] < minimum) {
+        minimum = list[i]
+      }
+    }
+    return minimum
+  }
+
+
+
   const createGameArray = async () => {
-    let allPhrases = [];
     const db = await openDatabase();
     db.transaction((tx) => {
+
       tx.executeSql(
-        "SELECT phrase FROM phrases WHERE category_id = ? ",
+        "SELECT * FROM phrases WHERE category_id = ? ",
         [categoryId],
-        (_, results) => {
-          for (let item of results.rows._array) {
-            allPhrases.push(item.phrase);
+        async (_, results) => {
+          let instances = JSON.parse(await AsyncStorage.getItem("instances"))
+          console.log(instances)
+          let phrasesInCategoryIds = []
+          console.log(results.rows._array)
+          for (result of results.rows._array) {
+            phrasesInCategoryIds.push(result.id)
           }
-          let i;
+
+          let instanceNumbers = [] // lista wystąpień każdego id
+          for (const [key, value] of Object.entries(instances)) { // fitrowanie do kategorii
+            if (phrasesInCategoryIds.includes(parseInt(key))) {
+              instanceNumbers.push(value)
+            }
+          }
+          const allTheSame = checkIfNoMinimum(instanceNumbers)
+          const commonMinimum = findMinimum(instanceNumbers)
+
+          let allPhrases = [];
+
+          for (let item of results.rows._array) {
+            if (instances[item.id.toString()] === commonMinimum || allTheSame) {
+              allPhrases.push(item);
+            }
+          }
           let gameArray = [];
-          for (i = 0; i < numOfPhrases; i++) {
+          let minimum = commonMinimum
+          console.log(allPhrases)
+          while (gameArray.length !== numOfPhrases) {
+            
             const randomItem =
-              allPhrases[Math.floor(Math.random() * allPhrases.length)];
-            allPhrases = allPhrases.filter((item) => item !== randomItem);
-            gameArray.push(randomItem);
+              allPhrases[Math.floor(Math.random() * allPhrases.length)]; // losowy item
+            allPhrases = allPhrases.filter((item) => item !== randomItem); // usuwamy go z ogólnej puli
+            gameArray.push(randomItem.phrase); // dodajemy do gry
+            instances[randomItem.id.toString()] += 1 // ustawiamy, że wystąpił
+            console.log(allPhrases.length)
+            if (allPhrases.length === 0) { // jeśli się wyczerpią te o najmniejszej liczbie wystąpień, dodajemy większe
+              minimum += 1
+              for (let item of results.rows._array) {
+                if (instances[item.id.toString()] === minimum) {
+                  allPhrases.push(item);
+                }
+              }
+              console.log("dodano wszystko o ", minimum)
+            }
           }
           setGameArray(gameArray);
+          await AsyncStorage.setItem("instances", JSON.stringify(instances))
         },
         (error) => {
           console.log(error);
@@ -62,9 +125,10 @@ export default function GameScreen({ route, navigation }) {
       );
     });
   };
-
   const finishGame = () => {
-    playFinishSound()
+    if (soundEffects) {
+      playFinishSound()
+    }
     navigation.navigate("GameFinishScreen", {
       confirmed: confirmed,
       skipped: skipped,
@@ -88,38 +152,34 @@ export default function GameScreen({ route, navigation }) {
       setSkipped(skipped + 1);
       setViewAnswerSkip(true);
       setTimeout(setViewAnswerSkip, 3000, false);
-      playSkipSound()
+      if (soundEffects) {
+        playSkipSound()
+      }
     }
   };
 
    // tu się funkcje powtarzają, bo, znowu, require() nie przyjmuje 
    // dynamicznych stringów i nie mogę dać jako zmiennej do funkcji
   const playConfirmSound = async () => {
-    console.log("loading success sound");
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sounds/confirm.mp3")
     );
-    console.log(sound)
     setSound(sound);
     await sound.playAsync();
   };
 
   const playSkipSound = async () => {
-    console.log("loading skip sound");
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sounds/skip.mp3")
     );
-    console.log(sound)
     setSound(sound);
     await sound.playAsync();
   };
 
-  const playFinishSound = async () => {
-    console.log("loading finsh sound");
+  const playFinishSound = async () => {S
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sounds/finish.mp3")
     );
-    console.log(sound)
     setSound(sound);
     await sound.playAsync();
   };
@@ -133,7 +193,9 @@ export default function GameScreen({ route, navigation }) {
       setConfirmed(confirmed + 1);
       setViewAnswerConfirm(true);
       setTimeout(setViewAnswerConfirm, 3000, false);
-      playConfirmSound();
+      if (soundEffects) {
+        playConfirmSound();
+      }
     }
   };
 
@@ -176,7 +238,6 @@ export default function GameScreen({ route, navigation }) {
   useEffect(() => {
     return sound
       ? () => {
-          console.log("Unloading Sound");
           sound.unloadAsync();
         }
       : undefined;
@@ -196,14 +257,14 @@ export default function GameScreen({ route, navigation }) {
           !viewAnswerConfirm &&
           !viewTimeUp && (
             <View style={styles.gameContainer}>
-              {showExit && (
+              {showBackButton ? (
                 <Pressable
                   style={styles.exitButton}
                   onPress={exitToCategory}
                 >
-                  <Text style={styles.exitText}>Wyjdź</Text>
+                    <Text style={styles.exitText}>Wyjdź</Text>
                 </Pressable>
-              )}
+              ): null}
               <Timer
                 parentStyles={styles.timer}
                 startTimeSeconds={remainingTime}
@@ -213,7 +274,6 @@ export default function GameScreen({ route, navigation }) {
               <View style={styles.titleContainer}>
                 <Text style={styles.text}>{gameArray[currentPhraseIndex]}</Text>
               </View>
-              {/* <Text style={styles.categoryName}>{categoryName}</Text> */}
               <View style={styles.buttonsContainer}>
                 <View style={styles.buttonContainer}>
                   <Button color="red" text="PAS" onPress={skipAnswer}></Button>

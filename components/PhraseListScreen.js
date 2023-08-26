@@ -23,7 +23,6 @@ export default function PhraseListScreen({ route, navigation }) {
     };
     getPhrases();
   }, []);
-  console.log(phrases);
   return (
     <View style={styles.listContainer}>
       <SafeAreaView>

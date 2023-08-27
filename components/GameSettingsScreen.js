@@ -7,7 +7,8 @@ import * as StatusBar from "expo-status-bar";
 import images from "../utils/images";
 import Button from "./Button";
 import { useIsFocused } from "@react-navigation/native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { openDatabase } from "../utils/openDatabase";
 
 export default function GameSettingsScreen({ route, navigation }) {
   const { gameTitle, categoryId, imageFilename } = route.params;
@@ -15,42 +16,64 @@ export default function GameSettingsScreen({ route, navigation }) {
   const [timeSeconds, setTimeSeconds] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showBackButton, setShowBackButton] = useState(false);
-  const [soundEffects, setSoundEffects] = useState(false)
+  const [soundEffects, setSoundEffects] = useState(false);
+  const [totalPhrases, setTotalPhrases] = useState(0);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     async function updateStorage() {
-      await AsyncStorage.setItem("settingPhrases", numOfPhrases.toString())
+      await AsyncStorage.setItem("settingPhrases", numOfPhrases.toString());
     }
     if (!loading) updateStorage();
   }, [numOfPhrases]);
 
   useEffect(() => {
     async function updateStorage() {
-      await AsyncStorage.setItem("settingSeconds", timeSeconds.toString())
+      await AsyncStorage.setItem("settingSeconds", timeSeconds.toString());
     }
     if (!loading) updateStorage();
   }, [timeSeconds]);
 
   useEffect(() => {
-    async function setData() {
-      const phrases = parseInt(await AsyncStorage.getItem("settingPhrases"))
-      const seconds = parseInt(await AsyncStorage.getItem("settingSeconds"))
+    const getTotalPhrases = async () => {
+      const db = await openDatabase();
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT count(*) as c FROM phrases WHERE category_id = ?",
+          [categoryId],
+          (_, results) => {
+            console.log(results.rows._array[0].c);
+            setTotalPhrases(results.rows._array[0].c);
+          },
+          (error) => {
+            console.log("Query error:", error);
+          }
+        );
+      });
+    };
+
+    const getSettings = async () => {
+      const phrases = parseInt(await AsyncStorage.getItem("settingPhrases"));
+      const seconds = parseInt(await AsyncStorage.getItem("settingSeconds"));
 
       //ładowanie ustawień
 
-      const showBackButton = parseInt(await AsyncStorage.getItem("settingShowBackButton"))
-      setShowBackButton(showBackButton)
+      const showBackButton = parseInt(
+        await AsyncStorage.getItem("settingShowBackButton")
+      );
+      setShowBackButton(showBackButton);
 
-      const soundEffects = parseInt(await AsyncStorage.getItem("settingSoundEffects"))
-      setSoundEffects(soundEffects)
-
+      const soundEffects = parseInt(
+        await AsyncStorage.getItem("settingSoundEffects")
+      );
+      setSoundEffects(soundEffects);
 
       setNumOfPhrases(phrases);
       setTimeSeconds(seconds);
       setLoading(false);
-    }
-    setData();
+    };
+    getTotalPhrases();
+    getSettings();
   }, []);
 
   useEffect(() => {
@@ -59,14 +82,14 @@ export default function GameSettingsScreen({ route, navigation }) {
         await ScreenOrientation.lockAsync(
           ScreenOrientation.OrientationLock.PORTRAIT_UP
         );
-      }
+      };
       lockLandscapeOrientation();
       StatusBar.setStatusBarHidden(false);
     }
   }, [isFocused]);
 
   function navigateToPhraseList() {
-    navigation.navigate("PhraseListScreen", {categoryId: categoryId})
+    navigation.navigate("PhraseListScreen", { categoryId: categoryId });
   }
 
   if (!loading) {
@@ -84,6 +107,7 @@ export default function GameSettingsScreen({ route, navigation }) {
             defaultValue={numOfPhrases}
             onValueChange={setNumOfPhrases}
             valueDifference={1}
+            maximum={totalPhrases}
           />
           <Text style={styles.subtitle}>Czas</Text>
           <MinuteCounter
@@ -93,22 +117,22 @@ export default function GameSettingsScreen({ route, navigation }) {
           />
         </View>
         <View style={styles.playButtonContainer}>
-        <Button
-          style={styles.button}
-          text={"Rozpocznij grę"}
-          color="#52A9FF"
-          onPress={() =>
-            navigation.navigate("GameScreen", {
-              numOfPhrases: numOfPhrases,
-              categoryId: categoryId,
-              categoryName: gameTitle,
-              totalTimeSeconds: timeSeconds,
-              showBackButton: showBackButton,
-              soundEffects: soundEffects,
-              imageFilename: imageFilename
-            })
-          }
-        />
+          <Button
+            style={styles.button}
+            text={"Rozpocznij grę"}
+            color="#52A9FF"
+            onPress={() =>
+              navigation.navigate("GameScreen", {
+                numOfPhrases: numOfPhrases,
+                categoryId: categoryId,
+                categoryName: gameTitle,
+                totalTimeSeconds: timeSeconds,
+                showBackButton: showBackButton,
+                soundEffects: soundEffects,
+                imageFilename: imageFilename,
+              })
+            }
+          />
         </View>
         <View style={styles.buttonContainer}>
           <Button
@@ -155,10 +179,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     height: "9%",
-    width: "50%"
+    width: "50%",
   },
   playButtonContainer: {
     width: "70%",
-    height: "13%"
-  }
+    height: "13%",
+  },
 });

@@ -9,7 +9,6 @@ import { useIsFocused } from "@react-navigation/native";
 import Button from "./Button";
 import { Audio } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { parse } from "expo-linking";
 
 export default function GameScreen({ route, navigation }) {
   const {
@@ -19,11 +18,10 @@ export default function GameScreen({ route, navigation }) {
     totalTimeSeconds,
     showBackButton,
     imageFilename,
-    soundEffects
+    soundEffects,
   } = route.params;
   const [remainingTime, setRemainingTime] = useState(totalTimeSeconds);
   const [countDownTimer, setCountdownTimer] = useState(5);
-  const [gameStarted, setGameStarted] = useState(false);
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [gameArray, setGameArray] = useState([]);
 
@@ -38,55 +36,52 @@ export default function GameScreen({ route, navigation }) {
 
   const focused = useIsFocused();
 
+  const [gameStarted, setGameStarted] = useState(false);
+
   const checkIfNoMinimum = (list) => {
     let i;
-    let firstItem = list[0]
+    let firstItem = list[0];
     for (i = 0; i < list.length; i++) {
       if (list[i] !== firstItem) {
-        return false
+        return false;
       }
     }
-    return true
-  }
+    return true;
+  };
 
   const findMinimum = (list) => {
-    console.log(list)
-    let minimum = 999999
+    let minimum = 999999;
     let i;
     for (i = 0; i < list.length; i++) {
       if (list[i] < minimum) {
-        minimum = list[i]
+        minimum = list[i];
       }
     }
-    return minimum
-  }
-
-
+    return minimum;
+  };
 
   const createGameArray = async () => {
     const db = await openDatabase();
     db.transaction((tx) => {
-
       tx.executeSql(
         "SELECT * FROM phrases WHERE category_id = ? ",
         [categoryId],
         async (_, results) => {
-          let instances = JSON.parse(await AsyncStorage.getItem("instances"))
-          console.log(instances)
-          let phrasesInCategoryIds = []
-          console.log(results.rows._array)
+          let instances = JSON.parse(await AsyncStorage.getItem("instances"));
+          let phrasesInCategoryIds = [];
           for (result of results.rows._array) {
-            phrasesInCategoryIds.push(result.id)
+            phrasesInCategoryIds.push(result.id);
           }
 
-          let instanceNumbers = [] // lista wystąpień każdego id
-          for (const [key, value] of Object.entries(instances)) { // fitrowanie do kategorii
+          let instanceNumbers = []; // lista wystąpień każdego id
+          for (const [key, value] of Object.entries(instances)) {
+            // fitrowanie do kategorii
             if (phrasesInCategoryIds.includes(parseInt(key))) {
-              instanceNumbers.push(value)
+              instanceNumbers.push(value);
             }
           }
-          const allTheSame = checkIfNoMinimum(instanceNumbers)
-          const commonMinimum = findMinimum(instanceNumbers)
+          const allTheSame = checkIfNoMinimum(instanceNumbers);
+          const commonMinimum = findMinimum(instanceNumbers);
 
           let allPhrases = [];
 
@@ -96,28 +91,25 @@ export default function GameScreen({ route, navigation }) {
             }
           }
           let gameArray = [];
-          let minimum = commonMinimum
-          console.log(allPhrases)
+          let minimum = commonMinimum;
           while (gameArray.length !== numOfPhrases) {
-            
             const randomItem =
               allPhrases[Math.floor(Math.random() * allPhrases.length)]; // losowy item
             allPhrases = allPhrases.filter((item) => item !== randomItem); // usuwamy go z ogólnej puli
-            gameArray.push(randomItem.phrase); // dodajemy do gry
-            instances[randomItem.id.toString()] += 1 // ustawiamy, że wystąpił
-            console.log(allPhrases.length)
-            if (allPhrases.length === 0) { // jeśli się wyczerpią te o najmniejszej liczbie wystąpień, dodajemy większe
-              minimum += 1
+            gameArray.push(randomItem); // dodajemy do gry
+            // instances[randomItem.id.toString()] += 1 // ustawiamy, że wystąpił
+            if (allPhrases.length === 0) {
+              // jeśli się wyczerpią te o najmniejszej liczbie wystąpień, dodajemy większe
+              minimum += 1;
               for (let item of results.rows._array) {
                 if (instances[item.id.toString()] === minimum) {
                   allPhrases.push(item);
                 }
               }
-              console.log("dodano wszystko o ", minimum)
             }
           }
           setGameArray(gameArray);
-          await AsyncStorage.setItem("instances", JSON.stringify(instances))
+          setGameStarted(true);
         },
         (error) => {
           console.log(error);
@@ -126,16 +118,16 @@ export default function GameScreen({ route, navigation }) {
     });
   };
   const finishGame = () => {
-    if (soundEffects) {
-      playFinishSound()
-    }
+    // if (soundEffects) {
+    //   playFinishSound()
+    // }
     navigation.navigate("GameFinishScreen", {
       confirmed: confirmed,
       skipped: skipped,
       gameTitle: categoryName,
       categoryId: categoryId,
       imageFilename: imageFilename,
-    })
+    });
   };
 
   const timeUp = () => {
@@ -145,6 +137,7 @@ export default function GameScreen({ route, navigation }) {
   };
 
   const skipAnswer = () => {
+    markCurrentItemAsUsed();
     if (currentPhraseIndex + 1 === gameArray.length) {
       finishGame();
     } else {
@@ -153,13 +146,13 @@ export default function GameScreen({ route, navigation }) {
       setViewAnswerSkip(true);
       setTimeout(setViewAnswerSkip, 3000, false);
       if (soundEffects) {
-        playSkipSound()
+        playSkipSound();
       }
     }
   };
 
-   // tu się funkcje powtarzają, bo, znowu, require() nie przyjmuje 
-   // dynamicznych stringów i nie mogę dać jako zmiennej do funkcji
+  // tu się funkcje powtarzają, bo, znowu, require() nie przyjmuje
+  // dynamicznych stringów i nie mogę dać jako zmiennej do funkcji
   const playConfirmSound = async () => {
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sounds/confirm.mp3")
@@ -176,16 +169,14 @@ export default function GameScreen({ route, navigation }) {
     await sound.playAsync();
   };
 
-  const playFinishSound = async () => {S
-    const { sound } = await Audio.Sound.createAsync(
-      require("../assets/sounds/finish.mp3")
-    );
-    setSound(sound);
-    await sound.playAsync();
+  const markCurrentItemAsUsed = async () => {
+    let instances = JSON.parse(await AsyncStorage.getItem("instances"));
+    instances[gameArray[currentPhraseIndex].id.toString()] += 1;
+    await AsyncStorage.setItem("instances", JSON.stringify(instances));
   };
 
-
-  const confirmAnswer = () => {
+  const confirmAnswer = async () => {
+    markCurrentItemAsUsed();
     if (currentPhraseIndex + 1 === gameArray.length) {
       finishGame();
     } else {
@@ -200,13 +191,13 @@ export default function GameScreen({ route, navigation }) {
   };
 
   const exitToCategory = () => {
-      navigation.navigate("GameSettings", {
-        skipped: skipped,
-        gameTitle: categoryName,
-        categoryId: categoryId,
-        imageFilename: imageFilename,
-      })
-  }
+    navigation.navigate("GameSettings", {
+      skipped: skipped,
+      gameTitle: categoryName,
+      categoryId: categoryId,
+      imageFilename: imageFilename,
+    });
+  };
 
   useEffect(() => {
     async function lockLandscapeOrientation() {
@@ -227,7 +218,6 @@ export default function GameScreen({ route, navigation }) {
       };
     } else if (countDownTimer == 0) {
       createGameArray();
-      setGameStarted(true);
     }
   }, [countDownTimer]);
 
@@ -242,7 +232,6 @@ export default function GameScreen({ route, navigation }) {
         }
       : undefined;
   }, [sound]);
-
   return (
     <>
       <View style={styles.container}>
@@ -258,13 +247,10 @@ export default function GameScreen({ route, navigation }) {
           !viewTimeUp && (
             <View style={styles.gameContainer}>
               {showBackButton ? (
-                <Pressable
-                  style={styles.exitButton}
-                  onPress={exitToCategory}
-                >
-                    <Text style={styles.exitText}>Wyjdź</Text>
+                <Pressable style={styles.exitButton} onPress={exitToCategory}>
+                  <Text style={styles.exitText}>Wyjdź</Text>
                 </Pressable>
-              ): null}
+              ) : null}
               <Timer
                 parentStyles={styles.timer}
                 startTimeSeconds={remainingTime}
@@ -272,7 +258,9 @@ export default function GameScreen({ route, navigation }) {
                 changeTime={setRemainingTime}
               ></Timer>
               <View style={styles.titleContainer}>
-                <Text style={styles.text}>{gameArray[currentPhraseIndex]}</Text>
+                <Text style={styles.text}>
+                  {gameArray[currentPhraseIndex].phrase}
+                </Text>
               </View>
               <View style={styles.buttonsContainer}>
                 <View style={styles.buttonContainer}>

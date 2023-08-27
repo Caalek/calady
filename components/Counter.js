@@ -4,6 +4,7 @@ export default function Counter({
   defaultValue,
   onValueChange,
   valueDifference,
+  maximum,
 }) {
   const [value, setValue] = useState(defaultValue);
 
@@ -18,7 +19,9 @@ export default function Counter({
   };
 
   const add = () => {
-    setValue(value + valueDifference);
+    if (value + valueDifference <= maximum) {
+      setValue(value + valueDifference);
+    }
   };
 
   return (
@@ -51,10 +54,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "10%",
     border: "1% solid",
-    borderRadius: 7
+    borderRadius: 7,
   },
   buttonLabel: {
     fontSize: 35,
-    color: "white"
+    color: "white",
   },
 });

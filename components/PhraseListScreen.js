@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   listText: {
     fontSize: 20,
-    fontFamily: "Inter"
+    fontFamily: "Inter",
   },
   listItem: {},
 });

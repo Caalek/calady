@@ -24,7 +24,9 @@ export default function InfoText({ text, color }) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{text}</Text>
-      {text !== "KONIEC CZASU" && <Text style={styles.smallText}>Połóż telefon na czoło!</Text>}
+      {text !== "KONIEC CZASU" && (
+        <Text style={styles.smallText}>Połóż telefon na czoło!</Text>
+      )}
     </View>
   );
 }

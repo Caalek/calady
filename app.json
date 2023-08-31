@@ -2,7 +2,7 @@
   "expo": {
     "name": "Calady",
     "slug": "calady",
-    "version": "2023.8.2",
+    "version": "2023.8.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

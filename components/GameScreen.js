@@ -72,14 +72,23 @@ export default function GameScreen({ route, navigation }) {
           for (result of results.rows._array) {
             phrasesInCategoryIds.push(result.id);
           }
-
           let instanceNumbers = []; // lista wystąpień każdego id
           for (const [key, value] of Object.entries(instances)) {
-            // fitrowanie do kategorii
             if (phrasesInCategoryIds.includes(parseInt(key))) {
               instanceNumbers.push(value);
             }
           }
+          console.log(instanceNumbers)
+
+          // const wyst = {0: 0, 1: 0}
+          // for (const item of instanceNumbers) {
+          //   if (Object.keys(wyst).includes(item)) {
+          //     wyst[item] = 1
+          //   } else {
+          //     wyst[item] += 1
+          //   }
+          // }
+
           const allTheSame = checkIfNoMinimum(instanceNumbers);
           const commonMinimum = findMinimum(instanceNumbers);
 
@@ -101,6 +110,7 @@ export default function GameScreen({ route, navigation }) {
             if (allPhrases.length === 0) {
               // jeśli się wyczerpią te o najmniejszej liczbie wystąpień, dodajemy większe
               minimum += 1;
+              // console.log("WYCZERPANE ID", minimum - 1, "DODAJE Z", minimum)
               for (let item of results.rows._array) {
                 if (instances[item.id.toString()] === minimum) {
                   allPhrases.push(item);
@@ -117,6 +127,8 @@ export default function GameScreen({ route, navigation }) {
       );
     });
   };
+
+
   const finishGame = () => {
     // if (soundEffects) {
     //   playFinishSound()
@@ -137,6 +149,7 @@ export default function GameScreen({ route, navigation }) {
   };
 
   const skipAnswer = () => {
+    //console.log("ODRZUCONO ID O NUMERZE", gameArray[currentPhraseIndex].id)
     markCurrentItemAsUsed();
     if (currentPhraseIndex + 1 === gameArray.length) {
       finishGame();
@@ -176,6 +189,7 @@ export default function GameScreen({ route, navigation }) {
   };
 
   const confirmAnswer = async () => {
+    //console.log("POTWIERDZONO ID O NUMERZE", gameArray[currentPhraseIndex].id)
     markCurrentItemAsUsed();
     if (currentPhraseIndex + 1 === gameArray.length) {
       finishGame();

@@ -41,8 +41,7 @@ export default function GameSettingsScreen({ route, navigation }) {
         tx.executeSql(
           "SELECT count(*) as c FROM phrases WHERE category_id = ?",
           [categoryId],
-          (_, results) => {
-            console.log(results.rows._array[0].c);
+          (_, results) => { 
             setTotalPhrases(results.rows._array[0].c);
           },
           (error) => {
@@ -132,13 +131,14 @@ export default function GameSettingsScreen({ route, navigation }) {
                 imageFilename: imageFilename,
               })
             }
+            overrideFontSize={25}
           />
         </View>
         <View style={styles.buttonContainer}>
           <Button
             text="Zobacz hasła"
             color="#52A9FF"
-            overrideFontSize={20}
+            overrideFontSize={18}
             onPress={navigateToPhraseList}
           ></Button>
         </View>

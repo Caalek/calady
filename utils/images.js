@@ -8,6 +8,7 @@ const images = {
     "10.jpg": require("../assets/10.jpg"),
     "gry.jpg": require("../assets/gry.jpg"),
     "jezyki.jpg": require("../assets/jezyki.jpg"),
+    "disney.jpg": require("../assets/disney.jpg")
 
 };
 

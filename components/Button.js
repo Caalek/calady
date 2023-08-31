@@ -19,6 +19,7 @@ export default function Button({ color, text, onPress, overrideFontSize }) {
       color: "white",
       fontFamily: "TitanOne",
       fontSize: overrideFontSize || 30,
+      textAlign: "center"
     },
   });
 

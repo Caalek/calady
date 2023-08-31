@@ -11,7 +11,8 @@ import MenuButton from "./components/MenuButton";
 import ImageCreditScreen from "./components/ImageCreditScreen";
 import PhraseListScreen from "./components/PhraseListScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { openDatabase } from "./utils/openDatabase"
+import { openDatabase } from "./utils/openDatabase";
+import setDefaultSettings from "./utils/defaultSettings";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,55 +23,25 @@ export default function App() {
     async function loadFonts() {
       await Font.loadAsync({
         TitanOne: require("./assets/fonts/TitanOne-Regular.ttf"),
-        Inter: require("./assets/fonts/Inter.ttf")
+        Inter: require("./assets/fonts/Inter.ttf"),
       });
       setFontsLoaded(true);
     }
     loadFonts();
 
     async function setDefaultValues() {
-
       // settings
       let keys = [];
       try {
         keys = await AsyncStorage.getAllKeys();
       } catch (e) {
-        console.error(error)
+        console.error(error);
       }
       if (keys.length !== 5) {
-        await AsyncStorage.setItem("settingPhrases", "10")
-        await AsyncStorage.setItem("settingSeconds", "180")
-        await AsyncStorage.setItem("settingShowBackButton", "1")
-        await AsyncStorage.setItem("settingSoundEffects", "1")
-        await AsyncStorage.setItem("instances", JSON.stringify({}))
-      }
-
-      if (!await AsyncStorage.getItem("instances")) {
-        let instancesObject = {}
-        let ids = []
-        const db = await openDatabase()
-        db.transaction((tx) => {
-          tx.executeSql(
-            "SELECT id FROM phrases",
-            [],
-            async (_, results) => {
-              for (result of results.rows._array) {
-                ids.push(result["id"])
-              }
-              for (id of ids) {
-                instancesObject[id] = 0
-              }
-              await AsyncStorage.setItem("instances", JSON.stringify(instancesObject))
-            },
-            (error) => {
-              console.log("Query error:", error);
-            }
-          );
-        });
-
+       setDefaultSettings()
       }
     }
-    setDefaultValues()
+    setDefaultValues();
   }, []);
 
   if (fontsLoaded) {

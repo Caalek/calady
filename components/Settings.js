@@ -1,8 +1,10 @@
-import { View, Text, StyleSheet, Image, Pressable } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, Alert } from "react-native";
 import Setting from "./Setting";
 import { useEffect, useState } from "react";
+import Button from "./Button";
 import * as Linking from "expo-linking";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import setDefaultSettings from "../utils/defaultSettings";
 
 export default function SettingsScreen({ navigation }) {
   const [settingShowBackButton, setSettingShowBackButton] = useState();
@@ -36,6 +38,11 @@ export default function SettingsScreen({ navigation }) {
     }
   }
 
+  function handleButtonPress() {
+    setDefaultSettings()
+    Alert.alert("Pamięć wyczyszczona")
+  }
+
   if (!loading) {
     return (
       <View style={styles.container}>
@@ -52,6 +59,13 @@ export default function SettingsScreen({ navigation }) {
             onUncheck={() => setSetting("settingSoundEffects", "0")}
             title={"Efekty dźwiękowe"}
           />
+          <View style={styles.lowerContainer}>
+            <View style={styles.buttonContainer}>
+            <Button  color={"#52A9FF"} text={"Wyczyść pamięć"} overrideFontSize={21} onPress={handleButtonPress}></Button>
+            <Text style={styles.center}>Zapomina, jakie hasła się powtarzały</Text>
+            </View>
+          </View>
+
         </View>
         <View style={styles.middleContainer}>
           <Text style={styles.bottomText}>Kontakt</Text>
@@ -107,7 +121,7 @@ const styles = StyleSheet.create({
     fontFamily: "TitanOne",
   },
   settings: {
-    height: "15%",
+    height: "39%",
   },
   bottomText: {
     fontSize: 23,
@@ -126,4 +140,16 @@ const styles = StyleSheet.create({
     gap: 10,
     flexDirection: "column",
   },
+  buttonContainer: {
+    height: "65%",
+    width: "50%",
+  },
+  lowerContainer: {
+    alignItems: "center"
+  },
+  center: {
+    fontSize: 16,
+    textAlign: "center",
+    fontFamily: "TitanOne"
+  }
 });
